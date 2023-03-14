@@ -72,7 +72,7 @@ and observe the value of the `consensus.latest_height` and
 
 :::
 
-[governance proposal]: ../validator-node/governance.md
+[governance proposal]: ../../../core/oasis-node/cli.md#gen_cast_vote
 
 Once the upgrade epoch is reached, follow the instructions in the corresponding
 [upgrade log].
