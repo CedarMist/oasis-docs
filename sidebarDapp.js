@@ -17,6 +17,7 @@ const sidebars = {
         'dapp/sapphire/browser',
         'dapp/sapphire/precompiles',
         'dapp/sapphire/addresses',
+        'dapp/sapphire/gsn',
       ],
     },
     {
