@@ -3,7 +3,7 @@ description: CLI instructions for deploying GSN on Sapphire Testnet
 ---
 # Gas Station Network
 
-[Gas Station Network](https://docs.opengsn.org) is very useful for improving user experiences of many Dapps by making their users send transactions without having native tokens for gas. We make GSN functionalities available on Sapphire Paratime.
+[Gas Station Network](https://docs.opengsn.org) is very useful for improving user experiences of many dApps by making their users send transactions without having native tokens for gas. We make GSN functionalities available on Sapphire ParaTime.
 
 ### Package Install
 
