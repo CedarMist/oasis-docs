@@ -1,25 +1,31 @@
 ---
-description: CLI instructions for deploying GSN on Sapphire Testnet
+description: CLI instructions for deploying GSN on Sapphire
 ---
 # Gas Station Network
 
-[Gas Station Network](https://docs.opengsn.org) is very useful for improving user experiences of many dApps by making their users send transactions without having native tokens for gas. We make GSN functionalities available on Sapphire ParaTime.
+[Gas Station Network](https://docs.opengsn.org) is very useful for improving the user experience of many dApps by making their users send transactions without having native tokens for gas. We make GSN functionalities available on Sapphire ParaTime.
 
 ### Package Install
 
-Starting with an empty folder, let us install the [Oasis fork](https://github.com/oasislabs/gsn) of the GSN command line tool by using the following commands:
+Starting with an empty folder, let us install the [Oasis fork of the GSN command line tool](https://github.com/oasislabs/gsn) by using the following commands:
 
 ```shell
 npm init -y
 npm install --save-dev @oasislabs/opengsn-cli 
 ```
 
-### Deploy GSN Contracts
-
-We can deploy GSN contracts by the following command. Remember to replace with your own private key and account address in it.
+Next, we will export our hex-encoded private key for deploying the gas station network as an environment variable:
 
 ```shell
-npx gsn deploy --network sapphire_testnet --burnAddress 0xfA3AC9f65C9D75EE3978ab76c6a1105f03156204 --devAddress 0xfA3AC9f65C9D75EE3978ab76c6a1105f03156204 --testToken true --testPaymaster true --yes --privateKeyHex '8a61cab2fd89c40c0f87275f2547bf0139fe78c4aa37eed0ee4357ce88033aae'
+export PRIVATE_KEY=0x...
+```
+
+### Deploy GSN Contracts
+
+We can deploy GSN contracts with the following command. Use the address of your account for `--burnAddress` and `--devAddress`, and your private key for `--privateKeyHex`:
+
+```shell
+npx gsn deploy --network sapphire_testnet --burnAddress 0xfA3AC9f65C9D75EE3978ab76c6a1105f03156204 --devAddress 0xfA3AC9f65C9D75EE3978ab76c6a1105f03156204 --testToken true --testPaymaster true --yes --privateKeyHex $PRIVATE_KEY
 ```
 
 After the command finishes successfully, you should find the addreses of deployed contracts at the end:
@@ -39,36 +45,34 @@ After the command finishes successfully, you should find the addreses of deploye
 
 ### Start GSN Relay Server
 
-Now we are ready to start our own relay server locally or publicly by using the following command:
+Now we are ready to start our own relay server by using the following command. Use the newly deployed `RelayHub` and `TestToken` contract addresses for `--relayHubAddress` and `--managerStakeTokenAddress` respectively.
 
 ```shell
 npx gsn relayer-run --relayHubAddress 0xc4423AB6133B06e4e60D594Ac49abE53374124b3 --managerStakeTokenAddress  0x6Ed21672c0c26Daa32943F7b1cA1f1d0ABdbac66 --ownerAddress '0xfA3AC9f65C9D75EE3978ab76c6a1105f03156204' --ethereumNodeUrl 'https://testnet.sapphire.oasis.dev' --workdir .
 ```
 
-Remember to replace the `relayHubAddress` and `managerStakeTokenAddress` with your newly deployed addresses of RelayHub and TestToken contracts.
-
 ### Fund and Register GSN Relay Server
 
-The first thing is to fund your relay server so that it has enough native tokens to pay for others' transactions:
+The first thing is to fund your relay server so that it has enough native tokens to pay for others' transactions. Let's fund the paymaster with 5 tokens. Use the `RelayHub` and `Paymaster` addresses for `--hub` and `--paymaster` values:
 
 ```shell
-npx gsn paymaster-fund --network sapphire_testnet --hub 0xc4423AB6133B06e4e60D594Ac49abE53374124b3 --paymaster 0x8C06261f58a024C958d42df89be7195c8690008d --privateKeyHex '8a61cab2fd89c40c0f87275f2547bf0139fe78c4aa37eed0ee4357ce88033aae' --amount 5000000000000000000
+npx gsn paymaster-fund --network sapphire_testnet --hub 0xc4423AB6133B06e4e60D594Ac49abE53374124b3 --paymaster 0x8C06261f58a024C958d42df89be7195c8690008d --privateKeyHex $PRIVATE_KEY --amount 5000000000000000000
 ```
 
 Then, we need to register the relay server with the your desired `relayUrl` by staking the `token` the relayHub requires.
 
 ```shell
-npx gsn relayer-register --network sapphire_testnet --relayUrl 'http://localhost:8090' --token 0x6Ed21672c0c26Daa32943F7b1cA1f1d0ABdbac66 --wrap true --privateKeyHex '8a61cab2fd89c40c0f87275f2547bf0139fe78c4aa37eed0ee4357ce88033aae'
+npx gsn relayer-register --network sapphire_testnet --relayUrl 'http://localhost:8090' --token 0x6Ed21672c0c26Daa32943F7b1cA1f1d0ABdbac66 --wrap true --privateKeyHex $PRIVATE_KEY
 ```
 
-After this step, your relay server should be ready to take incoming relay requests and then forward to the relayHub on Sapphire Testnet.
+After this step, your relay server should be ready to take incoming relay requests and forward them to the relay hub on Sapphire Testnet.
 
 ### Send Testing Relayed Requests:
 
 We can test whether a relayed request can be forwarded and processed correctly by using the following command:
 
 ```shell
-npx gsn send-request --network sapphire_testnet --abiFile 'node_modules/@oasislabs/opengsn-cli/dist/compiled/TestRecipient.json' --method emitMessage --methodParams 'hello world!' --to 0x594cd6354b23A5200a57355072E2A5B15354ee21 --paymaster 0x8C06261f58a024C958d42df89be7195c8690008d --privateKeyHex '8a61cab2fd89c40c0f87275f2547bf0139fe78c4aa37eed0ee4357ce88033aae' --from 0xfA3AC9f65C9D75EE3978ab76c6a1105f03156204 --gasLimit 150000 --gasPrice 100
+npx gsn send-request --network sapphire_testnet --abiFile 'node_modules/@oasislabs/opengsn-cli/dist/compiled/TestRecipient.json' --method emitMessage --methodParams 'hello world!' --to 0x594cd6354b23A5200a57355072E2A5B15354ee21 --paymaster 0x8C06261f58a024C958d42df89be7195c8690008d --privateKeyHex $PRIVATE_KEY --from 0xfA3AC9f65C9D75EE3978ab76c6a1105f03156204 --gasLimit 150000 --gasPrice 100
 ```
 
 :::info
